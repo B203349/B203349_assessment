@@ -1,8 +1,10 @@
 ---
 title: "MyFirstMarkdownDocument"
-author: "Matt Nagle"
+author: "B203349"
 date: "16/06/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -102,7 +104,7 @@ This requires the CollectedData, dictionary, and main_string as inputs (main_str
 main_string <- "This data describes the NHS England accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
 main_string
 ```
-### Incorporate attributes as metada
+### Incorporate attributes as metadata
 ```{r complete_dataset}
 complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
 main_string = main_string)
@@ -182,7 +184,7 @@ write_csv(ae, here("RawData", "ae_attendances.csv"))
 ## Subsetting the data
 The aim of my data capture tool is to help identify performance outliers in the with regard to the 4hr breaches. In order to do this effectively I will need use the entire dataset (i.e. the variables: index, period, attendances, breaches, organisation name, and organisation type).
 
-Of note whilst the 
+Of note the **performance** variable was deliberately not created as this is a function of the **attendances** and **breaches** variables. The variable can be created after the collection of data at the data analysis stage. 
 
 
 ## Creating test and training datasets
@@ -209,7 +211,7 @@ head(trainIndex)
 ```
 
 Assign all records in the trainIndex to the training data
-```{r z,message = FALSE, warning = FALSE}
+```{r zz,message = FALSE, warning = FALSE}
 aeTrain <- ae[ trainIndex,]
 nrow(aeTrain)
 ```
