@@ -116,34 +116,137 @@ attributes(complete_CollectedData)
 save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 ```
 
-# Loading NHS Datasets  
+# Loading NHS Datasets 
+
 ## Data
-## Uploading the data
+The **NHS England accident and emergency attendances and admissions (ae_attendances)** dataset will be loaded from the NHSRdatasets package. This dataset reports on the attendances, four-hour breaches and admissions for all A&E departments in England for the years 2016/17 through 2018/19 (Apr-Mar)
+
+## Loading the required packages
+Of note *tidyverse* and *here* packages are also required but have already been loaded earlier
+```{r a,message = FALSE, warning = FALSE}
+library(NHSRdatasets)
+library(knitr)
+library(scales)
+library(lubridate)
+library(caret)
+```
+
+## Loading ae_attendances data
+ae_attendances data is loaded from the NHSdatasets package
+```{r g,message = FALSE, warning = FALSE}
+data(ae_attendances)
+ae<-ae_attendances
+```
+
 ## Viewing the data
+The `head()` function is used to look at top n rows of a data frame (default n = 6 rows)
+```{r k,message = FALSE, warning = FALSE}
+head(ae)
+```
+### Check for missing data
+```{r n,message = FALSE, warning = FALSE}
+# Calculate how many NAs there are in each variable
+ae %>% 
+  map(is.na) %>%
+map(sum)
+```
+Data is complete
+
+## Add an index link column to ae_attendances data  
+The `rowid_to_column()` function is used to convert row identities to a column named index. This facilitates the linking of partitioned datasets to the raw data if required in the future.
+```{r o,message = FALSE, warning = FALSE}
+ae <- rowid_to_column(ae, "index")
+```
+
+
+### Tabiulate data for a report
+```{r p,message = FALSE, warning = FALSE}
+ae %>%
+  # Set the period column to show in month-year format
+  mutate_at(vars(period), format, "%b-%y") %>% 
+  # Set the numeric columns to have a comma at the 1000's place
+  mutate_at(vars(attendances, breaches, admissions), comma) %>%
+  # Show the first 10 rows
+  head(10) %>%
+  # Format as a table
+  kable()
+```
+
+
+
+## Save the raw ae_attendances data to your 'RawData' folder
+```{r q,message = FALSE, warning = FALSE}
+write_csv(ae, here("RawData", "ae_attendances.csv"))
+```
+
 ## Subsetting the data
+The aim of my data capture tool is to help identify performance outliers in the with regard to the 4hr breaches. In order to do this effectively I will need use the entire dataset (i.e. the variables: index, period, attendances, breaches, organisation name, and organisation type).
+
+Of note whilst the 
+
+
+## Creating test and training datasets
+
+### Calculate the proportion (`prop`) of the raw data to assign to the training data.
+The proportion of the raw that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data is:
+```{r y,message = FALSE, warning = FALSE}
+prop<-(1-(15/nrow(ae)))
+print(prop)
+```
+
+### Splitting the raw data
+The createDataPartition() function from the *caret* package is used to splint the raw data into test and training data sets.
+
+The 'set.seed()' function allows a random numner to be generated in a reproducable fashion. This ensures that every time the script is run the raw data will be partitioned into the same test and training datasets.
+
+```{r z,message = FALSE, warning = FALSE}
+set.seed(333)
+#Partitioning the raw data into the test and training data.
+trainIndex <- createDataPartition(ae$index, p = prop, 
+                                  list = FALSE, 
+                                  times = 1)
+head(trainIndex)
+```
+
+Assign all records in the trainIndex to the training data
+```{r z,message = FALSE, warning = FALSE}
+aeTrain <- ae[ trainIndex,]
+nrow(aeTrain)
+```
+
+Save the training data to the to working data folder 'Data' as ae_attendances_train.csv
+```{r ab,message = FALSE, warning = FALSE}
+write_csv(aeTrain, here("Data", "ae_attendances_train.csv"))
+```
+
+Extract the test data (all records that are not in the trainIndex (`-trainIndex`) are assigned to the test data).
+```{r ac,message = FALSE, warning = FALSE}
+aeTest  <- ae[-trainIndex,]
+nrow(aeTest)
+```
+
+Set aside the fist record for markers to test and evaluate the data-capture tool.
+```{r ad,message = FALSE, warning = FALSE}
+aeTestMarker  <- aeTest[1,]
+```
+
+Save the marker test data to the to working data folder 'Data' as ae_attendances_test_marker.csv
+```{r af,message = FALSE, warning = FALSE}
+write_csv(aeTestMarker, here("Data", "ae_attendances_test_marker.csv"))
+```
+
+
+The remaining records are set aside to test with the data capture tool. 
+These are saved to the to working data folder 'Data' as ae_attendances_test.csv
+```{r ag,message = FALSE, warning = FALSE}
+aeTest  <- aeTest[2:nrow(aeTest),]
+write_csv(aeTest, here("Data", "ae_attendances_test.csv"))
+```
+
+
 # Data Capture Tool (Python)
 
 
-New paragraph
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-## Load packages and data
-Let’s load the packages and data needed for this script.
-
-```{r a,message = FALSE, warning = FALSE}
-library(NHSRdatasets)
-library(tidyverse)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
