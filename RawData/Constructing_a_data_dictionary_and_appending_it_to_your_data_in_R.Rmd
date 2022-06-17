@@ -1,0 +1,168 @@
+---
+title: "**Constructing a data dictionary and appending it to your data in R**"
+author: "Mairead Bermingham"
+date: "`r format (Sys.time (), '%d %B, %Y')`"
+output: html_document
+---
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# **Overview**
+A data dictionary is an important tool in data management. A data dictionary is a supplementary document that details the information about variables, data collection, and other important features of a data set, i.e. metadata, data that describes other data. This metadata is crucial and helps others find, access, understand, and reuse your data. Without proper documentation, the data you store in online repositories may be rendered unfindable and unusable by others and indexing search engines. The *dataMeta* R package is designed to create a data dictionary and append it to the original dataset's attributes list along with other information generally provided as metadata. In this lesson, we will use the *dataMeta* R package to construct a data dictionary for a subset of the NHS England accident and emergency (A&E) attendances and admissions (`ae_attendances`) data from the *NHSRdatasets* package; we will then map the data and then save it as an R dataset (.rds) in your 'RawData' folder.
+
+# **Load packages and read in the data**
+Let’s load the packages and data needed for this document. The *dataMeta* packages is not installed on Noteable. Therefore, you will need to `install.packages('dataMeta')` every time you want to knit this document in RStudio in Notable. We will use the `read_csv()` function from the *readr* package from *tidyverse* to read in the data.  *tidyverse* is a collection of essential R packages for data science. The *readr* package provides a fast and friendly way to read rectangular data from delimited files, such as comma-separated values (CSV) and tab-separated values (TSV). The * readr * package is loaded by the *tidyverse* package as one of its core components. We will use the *here* package to build a path relative to the top-level directory to read the raw ae_attendances data from our 'RawData' folder. The *here* package enables easy file referencing in project-oriented workflows. In contrast to using `setwd()` function, which is fragile and dependent on the way you organise your files, here uses the top-level directory of a project to easily build paths to files. The *lubridate* provides tools that make it easier to manipulate dates in R. 
+
+```{r load}
+library(dataMeta)
+library (tidyverse)
+library(here)
+```
+
+# **Data**
+The data you will be managing on the course are from the NHSRdatasets package. This package has been created to support skills development in the NHS-R community and contains several free datasets. The dataset set I have chosen to manage from the NHSRdatasets package is the NHS England accident and emergency (A&E) attendances and admissions (`ae_attendances`) data. The `ae_attendances` data includes reported attendances, four-hour breaches and admissions for all A&E departments in England for 2016/17 through 2018/19 (Apr-Mar). We previously selected a subset of the variables needed for my data capture tool, including period, attendances and breaches, and subsetted the data into test and training data. However, for this lesson, we will use the data collected from the full `ae_attendances` dataset to demonstrate how to use the *dataMeta* to construct a data dictionary and append it to your collected data. The Jupyter Notebook  \"./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb\" was used to to collect the data.
+
+**Note**, you only need to construct and append of data dictionary for the subset of the variables required for your data capture tool. We are using the full data set here, as you will be using the *dataMeta* R package construct and append a data dictionary for different variables from your `ae_attendances` data subset collected by your data capture tool.
+
+Let us use the `read_csv()` function from the *readr* package to read your collected data from the Raw data folder.
+
+
+```{r data}
+CollectedData=read_csv(here("RawData", "CollectedDataAll.csv"))
+```
+
+
+## **Let's view the CollectedData ae_attendances data**
+The `glimpse()` function is from *tibble* package and is  used to view the columns/variables in a data frame. It also shows data type and some of the data in the data frame in each row. The *tibble* package provides utilities for handling tibbles. The *tibble* package is loaded by the *tidyverse* package, as one of its core components. 
+```{r glimpse1}
+glimpse(CollectedData) 
+```
+Here is the output of the `glimpse()' function. It starts off with the number of rows and columns and each column in separate rows.
+
+The CollectedData dataset contains: 
+
+* **index:**  the index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.  
+
+* **period:** the month that this activity relates to, stored as a date (1st of each month).  
+
+*	**org_code:** the Organisation data service (ODS) code for the organisation. The ODS code is a unique code created by the Organisation data service within [NHS Digital](_https://www.digitalsocialcare.co.uk/latest-guidance/how-to-find-your-ods-code/) and used to identify organisations across health and social care. ODS codes are required in order to gain access to national systems like NHSmail and the Data Security and Protection Toolkit. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: <https://odsportal.digital.nhs.uk/Organisation/Search>. For example, the organisation associated with the ODS code 'AF003' is
+[Parkway health centre](https://odsportal.digital.nhs.uk/Organisation/OrganisationDetails?organisationId=132839&showOpenChildredOnly=True).      
+
+*	**type:** the Department Type for this activity, either  
+    + **1:** Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients,  
+    + **2:** Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients, or  
+    + **other:** Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients. The department may be doctor-led or nurse-led and treats at least minor injuries and illnesses and can be routinely accessed without an appointment. A service mainly or entirely appointment-based (for example, a GP Practice or Outpatient clinic) is excluded even though it may treat a number of patients with minor illness or injury. Excludes NHS walk-in centres.[(National Health Service, 2020)](https://eu01.alma.exlibrisgroup.com/leganto/public/44UOE_INST/citation/37459630310002466?auth=SAML) 
+   
+* **attendances:** the number of attendances for this department type at this organisation for this month.    
+
+*	**breaches:** the number of attendances that breached the four-hour target.   
+
+*	**admissions:** the number of attendances that resulted in an admission to the hospital.[(Chris Mainey, 2021)](https://eu01.alma.exlibrisgroup.com/leganto/public/44UOE_INST/citation/37444097490002466?auth=SAML)
+
+*	**performance:** the performance `([1 - breaches]/attendances)` calculated for the whole of England.
+
+*	**consent:** the consent from the end-user to process and share the data collected with the data capture tool.
+
+
+
+# **Build a data dictionary for the data collected by the data capture tool**
+
+## **Build a linker data frame**
+We first need to build a linker data frame. To do this, we need to create two string vectors representing the different variable descriptions and the different variable types.
+
+### **Variable descriptions**
+We need to create a string vector representing the different variable descriptions.
+
+
+```{r variable_description}
+variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
+"The month that this activity relates to, stored as a date (1st of each month).",
+"The Organisation data service (ODS) code for the organisation. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: https://odsportal.digital.nhs.uk/Organisation/Search.", 
+"The department type for this activity.",
+"The number of attendances for this department type at this organisation for this month.", 
+"The number of attendances that breached the four-hour target.",  
+"The number of attendances that resulted in an admission to the hospital.",
+"The performance ([1 - breaches]/attendances) calculated for the whole of England.",
+"The consent from the end-user to process and share the data collected with the data capture tool.")
+print(variable_description)
+```
+
+### **Variable types**
+We need to create a string vector representing the different variable types. It is a vector of integers with values 0 or 1. We need to use 0 for a variable with quantitative values (measured values) variables and 1 for fixed values (allowable values or codes) variables. Let us use The `glimpse()` function from *tibble* package to view the variable types in the CollectedData data frame.
+```{r glimpse2}
+glimpse(CollectedData) 
+```
+We have five quantitative values (measured values) variables and four fixed values (allowable values or codes) variables.
+```{r variable_type}
+variable_type <- c(0, 1, 1, 1, 0, 0, 0, 0, 1)
+print(variable_type)
+```
+
+Now let us  use the `build_linker()` function from the *dataMeta* package to constructs an intermediary (linker) data frame between the CollectedData
+and the data dictionary. For this function to run, it requires the CollectedData data frame and variable_description and variable_type string vectors as inputs.
+```{r build_linker}
+linker<-build_linker(CollectedData, variable_description, variable_type)
+print(linker)
+```
+
+## **Data dictionary**
+We are now going to use the `build_dict()` function from the *dataMeta* to constructs a data dictionary for a CollectedData data frame with the aid of the linker data frame between. For this function to run, it requires the CollectedData and linker data frames and variable_description as inputs.  
+```{r dictionary}
+dictionary <- build_dict(my.data = CollectedData, linker = linker)
+glimpse(dictionary)
+```
+```{r notes}
+dictionary[7,4]<-"RDZ: NHS Trust - The Royal Bournemouth and Christchurch Hospitals NHS Foundation Trust."
+#You should do that for all Organisation data service (ODS) in the data dictionary
+dictionary[27,4] <-"other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+dictionary[28,4]<- "1: Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients."
+dictionary[29,4] <- "2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+```
+ 
+
+### **Let's save the data dictionary for CollectedData to the 'RawData' folder**
+Of note, when naming folders and files, you must do so in a consistent, logical and predictable way means that information may be located, identified and retrieved by your and your colleagues as quickly and efficiently as possible. With this in mind, let's name this file "CollectedData_DataDictionary" and write it to the raw data folder.
+```{r w,message = FALSE, warning = FALSE}
+glimpse(dictionary)
+write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
+```
+
+
+## **Append data dictionary to the CollectedData**
+We will now incorporate attributes as metadata to the CollectedData as metadata using the 'incorporate_attr()' function from the *dataMeta* package. For this function to run, it requires the CollectedData and dictionary and main_string main_string as inputs. main_string is a character string describing the CollectedData data frame.  
+
+#### **Create main_string for attributes**
+```{r main_string}
+main_string <- "This data describes the NHS England accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
+main_string
+```
+#### **Incorporate attributes as metada**
+We are using the 'incorporate_attr()' function to return an R dataset containing metadata stored in its attributes. The attributes we are going to add include: 
+* a data dictionary
+* number of columns
+* number of rows
+* the name of the author who created the dictionary and added it, 
+* the time when it was last edited 
+* a brief description of the original dataset.
+```{r complete_dataset}
+complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
+main_string = main_string)
+#Change the author name
+attributes(complete_CollectedData)$author[1]<-"Mairead Bermingham"
+complete_CollectedData
+attributes(complete_CollectedData)
+```
+
+##### **Save the CollectedData with attributes**
+
+We are using the 'save_it()' function to save the CollectedData with attributes stored as metadata as an R dataset (.rds) into the 'current working directory'RawData' folder. This is the final function used in this package. For the function to run, the complete_CollectedData, and the name of the file as a text string to name the file are required as inputs.
+```{r save_it}
+save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
+```
+###### **If you would like to load this data later, here is the code to do so**
+```{r readRDS}
+complete_CollectedData<-readRDS(here("RawData", "complete_CollectedData.rds"))
+```
+
+Well done! You now have now saved your CollectedData_DataDictionary and enriched CollectedData_DataDictionary.rds file to your 'Rawdata' folder. Happy coding!
