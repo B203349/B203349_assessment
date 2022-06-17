@@ -9,9 +9,120 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Data Dictionary
-# Data Capture Tool (Python)
+[Link to my git hub repository](https://github.com/B203349/B203349_assessment)
+
+# Data Dictionary for test data
+
+## Loading the required packages and reading the data
+
+### Loading packages
+```{r load}
+library(dataMeta)
+library (tidyverse)
+library(here)
+```
+
+### Reading the collected data
+`read_csv()` function from the *readr* package is used to read my collected data from the Raw data folder.
+```{r data}
+CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
+```
+
+## Building a linker data frame
+
+### Variable descriptions
+String vectors for the different variable descriptions
+
+```{r variable_description}
+variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
+"The month that this activity relates to, stored as a date (1st of each month).",
+"The Organisation data service (ODS) code for the organisation. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: https://odsportal.digital.nhs.uk/Organisation/Search.", 
+"The department type for this activity.",
+"The number of attendances for this department type at this organisation for this month.", 
+"The number of attendances that breached the four-hour target.",  
+"The number of attendances that resulted in an admission to the hospital.",
+"The consent from the end-user to process and share the data collected with the data capture tool.")
+print(variable_description)
+```
+
+### Variable types
+A string vector is created representing the different variable types. It is a vector of integers with values 0 or 1. 0 is used for a variable with quantitative values (measured values) variables and 1 for fixed values (allowable values or codes) variables.
+
+`glimpse()` function from *tibble* package is used to view the variable types in the CollectedData data frame
+```{r glimpse2}
+glimpse(CollectedData) 
+```
+
+This indicated that there are four quantitative values (measured values) variables and four fixed values (allowable values or codes) variables.
+```{r variable_type}
+variable_type <- c(0, 1, 1, 1, 0, 0, 0, 1)
+print(variable_type)
+```
+
+### Building the linker
+`build_linker()` function from the *dataMeta* package is used to construct an intermediary (linker) data frame between the CollectedData and the data dictionary. 
+```{r build_linker}
+linker<-build_linker(CollectedData, variable_description, variable_type)
+print(linker)
+```
+
+## Data dictionary
+the `build_dict()` function from the *dataMeta* package is used to construct a data dictionary for a CollectedData data frame with the aid of the linker data frame.
+```{r dictionary}
+dictionary <- build_dict(my.data = CollectedData, linker = linker)
+glimpse(dictionary)
+```
+```{r notes}
+dictionary[6,4]<-"C82010: Prescribing Cost Centre - OAKHAM MEDICAL PRACTICE"
+dictionary[7,4]<-"RDZ: NHS Trust - THE ROYAL BOURNEMOUTH AND CHRISTCHURCH HOSPITALS NHS FOUNDATION TRUST"
+dictionary[8,4]<-"RVR: NHS Trust - EPSOM AND ST HELIER UNIVERSITY HOSPITALS NHS TRUST"
+dictionary[9,4]<-"RQM: NHS Trust - CHELSEA AND WESTMINSTER HOSPITAL NHS FOUNDATION TRUST"
+dictionary[10,4]<-"R1F: NHS Trust - ISLE OF WIGHT NHS TRUST"
+dictionary[11,4]<-"RE9: NHS Trust - SOUTH TYNESIDE NHS FOUNDATION TRUST"
+dictionary[12,4]<-"RNL: NHS Trust - NORTH CUMBRIA UNIVERSITY HOSPITALS NHS TRUST"
+dictionary[13,4]<-"RJ1: NHS Trust - GUY'S AND ST THOMAS' NHS FOUNDATION TRUST"
+dictionary[14,4]<-"RKB: NHS Trust - UNIVERSITY HOSPITALS COVENTRY AND WARWICKSHIRE NHS TRUST"
+dictionary[15,4]<-"NLO12: Independent Sector H/c Provider Site - OAKHAM URGENT CARE CENTRE"
+dictionary[26,4] <-"other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+dictionary[27,4]<- "1: Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients."
+dictionary[28,4] <- "2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+```
+
+### Save the data dictionary for CollectedData to the 'RawData' folder
+```{r w,message = FALSE, warning = FALSE}
+glimpse(dictionary)
+write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
+```
+## Appending the data dictionary to data
+Incorporate attributes as metadata to the CollectedData as metadata using the 'incorporate_attr()' function from the *dataMeta* package.
+This requires the CollectedData, dictionary, and main_string as inputs (main_string is a character string describing the CollectedData data frame)
+
+### Create main_string for attributes
+```{r main_string}
+main_string <- "This data describes the NHS England accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
+main_string
+```
+### Incorporate attributes as metada
+```{r complete_dataset}
+complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
+main_string = main_string)
+attributes(complete_CollectedData)$author[1]<-"B203349"
+complete_CollectedData
+attributes(complete_CollectedData)
+```
+
+### Save the CollectedData with attributes
+```{r save_it}
+save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
+```
+
 # Loading NHS Datasets  
+## Data
+## Uploading the data
+## Viewing the data
+## Subsetting the data
+# Data Capture Tool (Python)
+
 
 New paragraph
 
