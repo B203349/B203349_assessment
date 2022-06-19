@@ -10,8 +10,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+<<<<<<< HEAD
 
 ##[Click here to link to my git hub repository](https://github.com/B203349/B203349_assessment)
+=======
+The link to my git hub repository is as follows: 
+[Link to my git hub repository](https://github.com/B203349/B203349_assessment)
+>>>>>>> 3153b540e09695bcd4acbe878f5c652a9af285f9
 
 # Data Dictionary for test data
 
