@@ -254,5 +254,5 @@ save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 
 # Data Capture Tool (Python)
 
-A data capture tool was created. The code was written in Python using a Jupyter notebook. Data will be collected using an interactive graphic user interface that was built using widgets from `ipywidgets` package. Collected data will be stored 
+A data capture tool was created. The code was written in Python using the Jupyter notebook. Data was collected using an interactive graphic user interface that was built using widgets from the `ipywidgets` package. During the active collection process data was saved to the Data folder as *CollectedData*. Once all data was collected the final dataset wa saved to the RawData folder as *CollectedDataFinal*.
 
