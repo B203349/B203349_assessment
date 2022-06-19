@@ -14,14 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 [Click here to link to my git hub repository](https://github.com/B203349/B203349_assessment)
 
-
-# Loading NHS Datasets 
-
-## Data
-The **NHS England accident and emergency attendances and admissions (ae_attendances)** dataset will be loaded from the NHSRdatasets package. This dataset reports on the attendances, four-hour breaches and admissions for all A&E departments in England for the years 2016/17 through 2018/19 (Apr-Mar)
-
-## Loading the required packages
-Of note *tidyverse* and *here* packages are also required but have already been loaded earlier
+# Loading the required packages required for this script
 ```{r a,message = FALSE, warning = FALSE}
 library(dataMeta)
 library(tidyverse)
@@ -32,6 +25,11 @@ library(scales)
 library(lubridate)
 library(caret)
 ```
+
+# Loading NHS Datasets 
+
+## Data
+The **NHS England accident and emergency attendances and admissions (ae_attendances)** dataset will be loaded from the NHSRdatasets package. This dataset reports on the attendances, four-hour breaches and admissions for all A&E departments in England for the years 2016/17 through 2018/19 (Apr-Mar)
 
 ## Loading ae_attendances data
 ae_attendances data is loaded from the NHSdatasets package
@@ -61,7 +59,8 @@ ae <- rowid_to_column(ae, "index")
 ```
 
 
-### Tabiulate data for a report
+### Preview dataset
+Tabulate data, and create report with `kable()`
 ```{r p,message = FALSE, warning = FALSE}
 ae %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
@@ -95,7 +94,7 @@ print(prop)
 ### Splitting the raw data
 The createDataPartition() function from the *caret* package is used to splint the raw data into test and training data sets.
 
-The 'set.seed()' function allows a random numner to be generated in a reproducable fashion. This ensures that every time the script is run the raw data will be partitioned into the same test and training datasets.
+**The `set.seed()` function allows a random numner to be generated in a reproducable fashion. This ensures that every time the script is run the raw data will be partitioned into the same test and training datasets.**
 
 ```{r z,message = FALSE, warning = FALSE}
 set.seed(333)
@@ -105,36 +104,35 @@ trainIndex <- createDataPartition(ae$index, p = prop,
 head(trainIndex)
 ```
 
-Assign all records in the trainIndex to the training data
+**Assign all records in the trainIndex to the training data**
 ```{r zz,message = FALSE, warning = FALSE}
 aeTrain <- ae[ trainIndex,]
 nrow(aeTrain)
 ```
 
-Save the training data to the to working data folder 'Data' as ae_attendances_train.csv
+**Save the training data to the to working data folder 'Data' as ae_attendances_train.csv**
 ```{r ab,message = FALSE, warning = FALSE}
 write_csv(aeTrain, here("Data", "ae_attendances_train.csv"))
 ```
 
-Extract the test data (all records that are not in the trainIndex (`-trainIndex`) are assigned to the test data).
+**Extract the test data (all records that are not in the trainIndex (`-trainIndex`) are assigned to the test data).**
 ```{r ac,message = FALSE, warning = FALSE}
 aeTest  <- ae[-trainIndex,]
 nrow(aeTest)
 ```
 
-Set aside the fist record for markers to test and evaluate the data-capture tool.
+**Set aside the fist record for markers to test and evaluate the data-capture tool.**
 ```{r ad,message = FALSE, warning = FALSE}
 aeTestMarker  <- aeTest[1,]
 ```
 
-Save the marker test data to the to working data folder 'Data' as ae_attendances_test_marker.csv
+**Save the marker test data to the to working data folder 'Data' as ae_attendances_test_marker.csv**
 ```{r af,message = FALSE, warning = FALSE}
 write_csv(aeTestMarker, here("Data", "ae_attendances_test_marker.csv"))
 ```
 
 
-The remaining records are set aside to test with the data capture tool. 
-These are saved to the to working data folder 'Data' as ae_attendances_test.csv
+**The remaining records are set aside to test with the data capture tool. These are saved to the to working data folder 'Data' as ae_attendances_test.csv** 
 ```{r ag,message = FALSE, warning = FALSE}
 aeTest  <- aeTest[2:nrow(aeTest),]
 write_csv(aeTest, here("Data", "ae_attendances_test.csv"))
@@ -142,16 +140,7 @@ write_csv(aeTest, here("Data", "ae_attendances_test.csv"))
 
 # Data Dictionary for test data
 
-## Loading the required packages and reading the data
-
-### Loading packages
-```{r load}
-library(dataMeta)
-library (tidyverse)
-library(here)
-```
-
-### Reading the collected data
+## Reading the collected data
 `read_csv()` function from the *readr* package is used to read my collected data from the Raw data folder.
 ```{r data}
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
@@ -221,7 +210,7 @@ dictionary[28,4] <- "2: Consultant-led mono speciality accident and emergency se
 write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
 ## Appending the data dictionary to data
-Incorporate attributes as metadata to the CollectedData as metadata using the 'incorporate_attr()' function from the *dataMeta* package.
+Incorporate attributes as metadata to the CollectedData as metadata using the `incorporate_attr()` function from the *dataMeta* package.
 This requires the CollectedData, dictionary, and main_string as inputs (main_string is a character string describing the CollectedData data frame)
 
 ### Create main_string for attributes
@@ -244,7 +233,10 @@ save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 
 # Data Capture Tool (Python)
 
-
+A data capture tool was created.
+* The code was written in Python using a Jupyter notebook. 
+* Data will be collected using an interactive grahic user interface that was built using widgets from `ipywidgets` package. 
+*Collected data will be stored 
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
