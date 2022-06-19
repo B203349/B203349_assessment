@@ -46,7 +46,7 @@ The `head()` function is used to look at top n rows of a data frame (default n =
 head(ae)
 ```
 
-### Check for missing data
+## Check for missing data
 Calculate how many NAs there are in each variable
 ```{r n,message = FALSE, warning = FALSE}
 ae %>% 
@@ -61,7 +61,7 @@ The `rowid_to_column()` function is used to convert row identities to a column n
 ae <- rowid_to_column(ae, "index")
 ```
 
-### Preview dataset
+## Preview dataset
 Tabulate data, and create report with `kable()`
 ```{r p,message = FALSE, warning = FALSE}
 ae %>%
