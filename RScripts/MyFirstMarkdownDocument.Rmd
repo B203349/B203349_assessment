@@ -10,7 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+The link to my git hub repository is as follows: 
 [Link to my git hub repository](https://github.com/B203349/B203349_assessment)
 
 # Data Dictionary for test data
