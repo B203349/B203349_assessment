@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-[Link to my git hub repository](https://github.com/B203349/B203349_assessment)
+##[Click here to link to my git hub repository](https://github.com/B203349/B203349_assessment)
 
 # Data Dictionary for test data
 
@@ -33,7 +33,7 @@ CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
 ## Building a linker data frame
 
 ### Variable descriptions
-String vectors for the different variable descriptions
+String vectors are created for the different variable descriptions
 
 ```{r variable_description}
 variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
@@ -72,7 +72,6 @@ print(linker)
 the `build_dict()` function from the *dataMeta* package is used to construct a data dictionary for a CollectedData data frame with the aid of the linker data frame.
 ```{r dictionary}
 dictionary <- build_dict(my.data = CollectedData, linker = linker)
-glimpse(dictionary)
 ```
 ```{r notes}
 dictionary[6,4]<-"C82010: Prescribing Cost Centre - OAKHAM MEDICAL PRACTICE"
@@ -92,7 +91,6 @@ dictionary[28,4] <- "2: Consultant-led mono speciality accident and emergency se
 
 ### Save the data dictionary for CollectedData to the 'RawData' folder
 ```{r w,message = FALSE, warning = FALSE}
-glimpse(dictionary)
 write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
 ## Appending the data dictionary to data
@@ -102,7 +100,6 @@ This requires the CollectedData, dictionary, and main_string as inputs (main_str
 ### Create main_string for attributes
 ```{r main_string}
 main_string <- "This data describes the NHS England accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
-main_string
 ```
 ### Incorporate attributes as metadata
 ```{r complete_dataset}
@@ -164,13 +161,9 @@ ae <- rowid_to_column(ae, "index")
 ### Tabiulate data for a report
 ```{r p,message = FALSE, warning = FALSE}
 ae %>%
-  # Set the period column to show in month-year format
   mutate_at(vars(period), format, "%b-%y") %>% 
-  # Set the numeric columns to have a comma at the 1000's place
   mutate_at(vars(attendances, breaches, admissions), comma) %>%
-  # Show the first 10 rows
   head(10) %>%
-  # Format as a table
   kable()
 ```
 
@@ -182,7 +175,7 @@ write_csv(ae, here("RawData", "ae_attendances.csv"))
 ```
 
 ## Subsetting the data
-The aim of my data capture tool is to help identify performance outliers in the with regard to the 4hr breaches. In order to do this effectively I will need use the entire dataset (i.e. the variables: index, period, attendances, breaches, organisation name, and organisation type).
+The aim of my data capture tool is to help identify performance outliers with regard to the 4hr breaches. In order to do this effectively I will need use the entire dataset (i.e. the variables: index, period, attendances, breaches, organisation name, and organisation type).
 
 Of note the **performance** variable was deliberately not created as this is a function of the **attendances** and **breaches** variables. The variable can be created after the collection of data at the data analysis stage. 
 
@@ -203,7 +196,6 @@ The 'set.seed()' function allows a random numner to be generated in a reproducab
 
 ```{r z,message = FALSE, warning = FALSE}
 set.seed(333)
-#Partitioning the raw data into the test and training data.
 trainIndex <- createDataPartition(ae$index, p = prop, 
                                   list = FALSE, 
                                   times = 1)
