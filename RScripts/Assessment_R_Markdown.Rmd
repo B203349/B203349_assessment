@@ -31,6 +31,7 @@ library(caret)
 ## Data
 The **NHS England accident and emergency attendances and admissions (ae_attendances)** dataset will be loaded from the NHSRdatasets package. This dataset reports on the attendances, four-hour breaches and admissions for all A&E departments in England for the years 2016/17 through 2018/19 (Apr-Mar)
 
+
 ## Loading ae_attendances data
 ae_attendances data is loaded from the NHSdatasets package
 ```{r g,message = FALSE, warning = FALSE}
@@ -38,11 +39,13 @@ data(ae_attendances)
 ae<-ae_attendances
 ```
 
+
 ## Viewing the data
 The `head()` function is used to look at top n rows of a data frame (default n = 6 rows)
 ```{r k,message = FALSE, warning = FALSE}
 head(ae)
 ```
+
 ### Check for missing data
 Calculate how many NAs there are in each variable
 ```{r n,message = FALSE, warning = FALSE}
@@ -57,7 +60,6 @@ The `rowid_to_column()` function is used to convert row identities to a column n
 ```{r o,message = FALSE, warning = FALSE}
 ae <- rowid_to_column(ae, "index")
 ```
-
 
 ### Preview dataset
 Tabulate data, and create report with `kable()`
@@ -82,6 +84,7 @@ The aim of my data capture tool is to help identify performance outliers with re
 Of note the **performance** variable was deliberately not created as this is a function of the **attendances** and **breaches** variables. The variable can be created after the collection of data at the data analysis stage. 
 
 
+
 ## Creating test and training datasets
 
 ### Calculate the proportion (`prop`) of the raw data to assign to the training data.
@@ -103,16 +106,19 @@ trainIndex <- createDataPartition(ae$index, p = prop,
 head(trainIndex)
 ```
 
+
 Assign all records in the trainIndex to the training data
 ```{r zz,message = FALSE, warning = FALSE}
 aeTrain <- ae[ trainIndex,]
 nrow(aeTrain)
 ```
 
+
 Save the training data to the to working data folder 'Data' as ae_attendances_train.csv
 ```{r ab,message = FALSE, warning = FALSE}
 write_csv(aeTrain, here("Data", "ae_attendances_train.csv"))
 ```
+
 
 Extract the test data (all records that are not in the trainIndex (`-trainIndex`) are assigned to the test data).
 ```{r ac,message = FALSE, warning = FALSE}
@@ -120,10 +126,12 @@ aeTest  <- ae[-trainIndex,]
 nrow(aeTest)
 ```
 
+
 Set aside the fist record for markers to test and evaluate the data-capture tool.
 ```{r ad,message = FALSE, warning = FALSE}
 aeTestMarker  <- aeTest[1,]
 ```
+
 
 Save the marker test data to the to working data folder 'Data' as ae_attendances_test_marker.csv
 ```{r af,message = FALSE, warning = FALSE}
@@ -136,6 +144,11 @@ The remaining records are set aside to test with the data capture tool. These ar
 aeTest  <- aeTest[2:nrow(aeTest),]
 write_csv(aeTest, here("Data", "ae_attendances_test.csv"))
 ```
+
+
+
+
+
 
 # Data Dictionary for test data
 
@@ -183,6 +196,7 @@ linker<-build_linker(CollectedData, variable_description, variable_type)
 print(linker)
 ```
 
+
 ## Data dictionary
 the `build_dict()` function from the *dataMeta* package is used to construct a data dictionary for a CollectedData data frame with the aid of the linker data frame.
 ```{r dictionary}
@@ -204,10 +218,13 @@ dictionary[27,4]<- "1: Emergency departments are a consultant-led 24-hour servic
 dictionary[28,4] <- "2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
 ```
 
+
 ### Save the data dictionary for CollectedData to the 'RawData' folder
 ```{r w,message = FALSE, warning = FALSE}
 write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
+
+
 ## Appending the data dictionary to data
 Incorporate attributes as metadata to the CollectedData as metadata using the `incorporate_attr()` function from the *dataMeta* package.
 This requires the CollectedData, dictionary, and main_string as inputs (main_string is a character string describing the CollectedData data frame)
@@ -216,6 +233,7 @@ This requires the CollectedData, dictionary, and main_string as inputs (main_str
 ```{r main_string}
 main_string <- "This data describes the NHS England accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
 ```
+
 ### Incorporate attributes as metadata
 ```{r complete_dataset}
 complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
@@ -229,6 +247,10 @@ attributes(complete_CollectedData)
 ```{r save_it}
 save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 ```
+
+
+
+
 
 # Data Capture Tool (Python)
 
