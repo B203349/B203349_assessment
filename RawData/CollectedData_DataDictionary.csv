@@ -1,9 +1,9 @@
-variable name,variable description,variable options,notes
-admissions,The number of attendances that resulted in an admission to the hospital.,0 to 3375,
-attendances,The number of attendances for this department type at this organisation for this month.,200 to 15957,
-breaches,The number of attendances that breached the four-hour target.,0 to 1374,
-consent,The consent from the end-user to process and share the data collected with the data capture tool.,TRUE,
-index,The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.,1155 to 11767,
+variable_name,variable_description,variable_options,notes
+admissions,The number of attendances that resulted in an admission to the hospital.,0 to 3375,NA
+attendances,The number of attendances for this department type at this organisation for this month.,200 to 15957,NA
+breaches,The number of attendances that breached the four-hour target.,0 to 1374,NA
+consent,The consent from the end-user to process and share the data collected with the data capture tool.,TRUE,NA
+index,The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.,1155 to 11767,NA
 org_code,"The Organisation data service (ODS) code for the organisation. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: https://odsportal.digital.nhs.uk/Organisation/Search.",C82010,C82010: Prescribing Cost Centre - OAKHAM MEDICAL PRACTICE
  , ,RDZ,RDZ: NHS Trust - THE ROYAL BOURNEMOUTH AND CHRISTCHURCH HOSPITALS NHS FOUNDATION TRUST
  , ,RVR,RVR: NHS Trust - EPSOM AND ST HELIER UNIVERSITY HOSPITALS NHS TRUST
@@ -14,16 +14,16 @@ org_code,"The Organisation data service (ODS) code for the organisation. If you 
  , ,RJ1,RJ1: NHS Trust - GUY'S AND ST THOMAS' NHS FOUNDATION TRUST
  , ,RKB,RKB: NHS Trust - UNIVERSITY HOSPITALS COVENTRY AND WARWICKSHIRE NHS TRUST
  , ,NLO12,NLO12: Independent Sector H/c Provider Site - OAKHAM URGENT CARE CENTRE
-period,"The month that this activity relates to, stored as a date (1st of each month).",17136,
- , ,17075,
- , ,16922,
- , ,17591,
- , ,17563,
- , ,17348,
- , ,17257,
- , ,17928,
- , ,17805,
- , ,17683,
+period,"The month that this activity relates to, stored as a date (1st of each month).",17136,NA
+ , ,17075,NA
+ , ,16922,NA
+ , ,17591,NA
+ , ,17563,NA
+ , ,17348,NA
+ , ,17257,NA
+ , ,17928,NA
+ , ,17805,NA
+ , ,17683,NA
 type,The department type for this activity.,other,other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients.
  , ,1,1: Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients.
  , ,2,"2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."

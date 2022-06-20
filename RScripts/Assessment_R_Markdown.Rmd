@@ -1,18 +1,18 @@
 ---
 title: "Assessment R Markdown"
 author: "B203349"
-date: "16/06/2022"
+date: "20/06/2022"
 output:
   pdf_document: default
   html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, results='hide')
 ```
 
 
-[Click here to link to my git hub repository](https://github.com/B203349/B203349_assessment)
+# [Click here to link to my github repository](https://github.com/B203349/B203349_assessment)
 
 # Loading the required packages required for this script
 ```{r a,message = FALSE, warning = FALSE}
@@ -200,8 +200,10 @@ print(linker)
 ## Data dictionary
 the `build_dict()` function from the *dataMeta* package is used to construct a data dictionary for a CollectedData data frame with the aid of the linker data frame.
 ```{r dictionary}
-dictionary <- build_dict(my.data = CollectedData, linker = linker)
+dictionary <- build_dict(my.data = CollectedData, linker = linker, prompt_varopts = FALSE)
 ```
+
+Descriptions are added for variables that entered as abreviations
 ```{r notes}
 dictionary[6,4]<-"C82010: Prescribing Cost Centre - OAKHAM MEDICAL PRACTICE"
 dictionary[7,4]<-"RDZ: NHS Trust - THE ROYAL BOURNEMOUTH AND CHRISTCHURCH HOSPITALS NHS FOUNDATION TRUST"
@@ -216,6 +218,7 @@ dictionary[15,4]<-"NLO12: Independent Sector H/c Provider Site - OAKHAM URGENT C
 dictionary[26,4] <-"other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
 dictionary[27,4]<- "1: Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients."
 dictionary[28,4] <- "2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+names(dictionary)[4] <- "notes"
 ```
 
 
