@@ -73,7 +73,7 @@ ae %>%
 
 
 
-## Save the raw ae_attendances data to your 'RawData' folder
+## Save the raw ae_attendances data to 'RawData' folder
 ```{r q,message = FALSE, warning = FALSE}
 write_csv(ae, here("RawData", "ae_attendances.csv"))
 ```
@@ -88,7 +88,7 @@ Of note the **performance** variable was deliberately not created as this is a f
 ## Creating test and training datasets
 
 ### Calculate the proportion (`prop`) of the raw data to assign to the training data.
-The proportion of the raw that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data is:
+The proportion of the raw data that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data is:
 ```{r y,message = FALSE, warning = FALSE}
 prop<-(1-(15/nrow(ae)))
 print(prop)
@@ -97,7 +97,7 @@ print(prop)
 ### Splitting the raw data
 The createDataPartition() function from the *caret* package is used to splint the raw data into test and training data sets.
 
-The `set.seed()` function allows a random numner to be generated in a reproducable fashion. This ensures that every time the script is run the raw data will be partitioned into the same test and training datasets.
+The `set.seed()` function allows a random number to be generated in a reproducible fashion. This ensures that every time the script is run the raw data will be partitioned into the same test and training datasets.
 ```{r z,message = FALSE, warning = FALSE}
 set.seed(333)
 trainIndex <- createDataPartition(ae$index, p = prop, 
