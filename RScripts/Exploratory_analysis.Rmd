@@ -1,0 +1,82 @@
+---
+title: "Exploratory analysis"
+author: "B203349"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load packages
+
+```{r load packages, echo=FALSE}
+library(tidyverse)
+library(NHSRdatasets)
+library(here)
+library(knitr)
+library(scales)
+library(lubridate)
+library(caret)
+library(ggpubr)
+```
+
+## Loading the data sets
+Load the ae_attendances datasets
+
+```{r load datasets, echo=FALSE}
+data(ae_attendances)
+ae<-ae_attendances
+```
+
+
+```{r format, echo=FALSE}
+ENG_performance <- ae_attendances %>%
+  group_by(org_code, period) %>%
+  filter(any(type == 1)) %>% # make sure that this trust has a type 1 department
+  summarise_at(vars(attendances, breaches), sum) %>%
+  mutate(performance = 1 - breaches / attendances)
+
+#Create tibble of ranking hospitals 
+hosp_performance_rank <- ae %>%
+  filter(type == 1)%>%
+  group_by(org_code) %>%
+  summarise_at(vars(attendances, breaches), sum) %>%
+  filter(attendances >= 500000) %>%
+  mutate(performance = 1 - breaches / attendances) %>%
+  arrange(performance) 
+
+#ranking list of ranking hospitals by abbreviation
+hosp_performance_rank_abbr <- hosp_performance_rank %>%
+  pull(org_code) %>%
+  as.character()
+```
+
+#Line graph best vs worst hospital
+```{r create line graph, echo=FALSE}
+#graph hospitals against each other
+ENG_performance %>%
+  ungroup() %>%
+  mutate_at(vars(org_code), fct_relevel, hosp_performance_rank_abbr) %>%
+  filter(org_code %in% c(tail(hosp_performance_rank_abbr, 1),
+                         head(hosp_performance_rank_abbr, 1))) %>%
+  ggplot(aes(period, performance)) +
+  geom_line(color = "darkcyan") +
+  geom_point(color = "darkcyan") +
+  scale_y_continuous(labels = percent) +
+  scale_x_date(date_breaks = "2 months",
+               date_labels = "%b-%y")+
+  facet_wrap(vars(org_code), nrow = 2) +
+  theme(legend.position = "bottom") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5)) +
+  labs(x = "Month of attendance",
+       y = "% of attendances that met the 4-hour standard",
+       title = "NHS England accident and emergency (A&E) four hour performance",
+       subtitle = " Worst vs Best (Hospitals with >500,000 attendances)",
+       caption = "Source: NHSRdatasets")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
