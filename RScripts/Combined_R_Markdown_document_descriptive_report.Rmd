@@ -3,8 +3,9 @@ title: "Assessment R Markdown"
 author: "B203349"
 date: "20/06/2022"
 output:
-  pdf_document: default
+  word_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
