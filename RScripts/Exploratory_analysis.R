@@ -122,8 +122,11 @@ ENG_performance %>%
   geom_line(color = "darkcyan") +
   geom_point(color = "darkcyan") +
   scale_y_continuous(labels = percent) +
+  scale_x_date(date_breaks = "2 months",
+               date_labels = "%b-%y")+
   facet_wrap(vars(org_code), nrow = 2) +
   theme(legend.position = "bottom") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5)) +
   labs(x = "Month of attendance",
        y = "% of attendances that met the 4-hour standard",
        title = "NHS England accident and emergency (A&E) four hour performance",
